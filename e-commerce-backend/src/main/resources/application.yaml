@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: e-commerce-backend
+  docker:
+    compose:
+      enabled: true
+      file: ../compose.yaml
+      start:
+        command: "up"
+        arguments: "--build"
+      stop:
+        command: "down"
+        arguments:
+          - "--remove-orphans"
+          - "--volumes"
