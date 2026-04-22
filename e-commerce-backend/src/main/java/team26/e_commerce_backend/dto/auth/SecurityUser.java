@@ -1,4 +1,4 @@
-package team26.e_commerce_backend.dto;
+package team26.e_commerce_backend.dto.auth;
 
 import java.util.Collection;
 import java.util.List;
@@ -28,25 +28,5 @@ public class SecurityUser implements UserDetails {
   @Override
   public String getUsername() {
     return user.getEmail();
-  }
-
-  @Override
-  public boolean isAccountNonExpired() {
-    return true;
-  }
-
-  @Override
-  public boolean isAccountNonLocked() {
-    return true;
-  }
-
-  @Override
-  public boolean isCredentialsNonExpired() {
-    return true;
-  }
-
-  @Override
-  public boolean isEnabled() {
-    return true;
   }
 }
