@@ -1,5 +1,7 @@
 package team26.e_commerce_backend.config;
 
+import java.util.HashMap;
+import java.util.Map;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -7,6 +9,9 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
@@ -28,5 +33,13 @@ public class SecurityConfig {
         .csrf(AbstractHttpConfigurer::disable);
 
     return http.build();
+  }
+
+  @Bean
+  public PasswordEncoder passwordEncoder() {
+    Map<String, PasswordEncoder> encoders = new HashMap<>();
+    encoders.put("bcrypt", new BCryptPasswordEncoder());
+
+    return new DelegatingPasswordEncoder("bcrypt", encoders);
   }
 }
