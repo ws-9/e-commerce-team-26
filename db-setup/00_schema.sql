@@ -19,6 +19,6 @@ CREATE TABLE sellers
     business_name VARCHAR(255)         NOT NULL,
     description   TEXT,
     verified      BOOLEAN DEFAULT TRUE NOT NULL,
-    taxId         VARCHAR(100)         NOT NULL,
+    tax_id        VARCHAR(100)         NOT NULL,
     contact_email VARCHAR(255)         NOT NULL
 );

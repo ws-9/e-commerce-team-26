@@ -24,13 +24,18 @@ public class SecurityConfig {
             configurer ->
                 configurer
                     .requestMatchers(
-                        "/docs/**", "/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html")
+                        "/docs/**",
+                        "/swagger-ui/**",
+                        "/v3/api-docs",
+                        "/v3/api-docs/**",
+                        "/swagger-ui.html")
                     .permitAll()
                     .requestMatchers(HttpMethod.POST, "/api/auth/*")
                     .permitAll()
                     .anyRequest()
                     .authenticated())
         .httpBasic(Customizer.withDefaults())
+        .cors(Customizer.withDefaults())
         .csrf(AbstractHttpConfigurer::disable)
         .sessionManagement(
             session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
