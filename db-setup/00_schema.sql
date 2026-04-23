@@ -9,16 +9,16 @@ CREATE TABLE users
 
 CREATE TABLE admins
 (
-    id      BIGINT PRIMARY KEY REFERENCES users (id) ON DELETE CASCADE,
+    user_id BIGINT PRIMARY KEY REFERENCES users (id) ON DELETE CASCADE,
     enabled BOOLEAN DEFAULT TRUE NOT NULL
 );
 
 CREATE TABLE sellers
 (
-    id           BIGINT PRIMARY KEY REFERENCES users (id) ON DELETE CASCADE,
-    businessName VARCHAR(255)         NOT NULL,
-    description  TEXT,
-    verified     BOOLEAN DEFAULT TRUE NOT NULL,
-    taxId        VARCHAR(100)         NOT NULL,
-    contactEmail VARCHAR(255)         NOT NULL
+    user_id       BIGINT PRIMARY KEY REFERENCES users (id) ON DELETE CASCADE,
+    business_name VARCHAR(255)         NOT NULL,
+    description   TEXT,
+    verified      BOOLEAN DEFAULT TRUE NOT NULL,
+    taxId         VARCHAR(100)         NOT NULL,
+    contact_email VARCHAR(255)         NOT NULL
 );
