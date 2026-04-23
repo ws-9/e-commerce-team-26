@@ -6,10 +6,13 @@
 
 	onMount(() => {
 		const state = get(auth);
-		if (state.token) {
-			goto('/dashboard');
-		} else {
+		if (!state.user) {
 			goto('/login');
+			return;
 		}
+		const role = state.user.role;
+		if (role === 'ADMIN') goto('/dashboard/admin');
+		else if (role === 'SELLER') goto('/dashboard/seller');
+		else goto('/dashboard/shopper');
 	});
 </script>

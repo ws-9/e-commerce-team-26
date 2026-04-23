@@ -13,3 +13,8 @@ spring:
         arguments:
           - "--remove-orphans"
           - "--volumes"
+
+app:
+  jwt:
+    secret: team26-super-secret-jwt-signing-key-dev-only-32chars
+    expiration: 86400000
