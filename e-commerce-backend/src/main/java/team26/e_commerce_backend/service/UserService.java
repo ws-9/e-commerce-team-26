@@ -1,5 +1,6 @@
 package team26.e_commerce_backend.service;
 
+import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -12,6 +13,12 @@ public class UserService {
 
   public UserService(UserRepository userRepository) {
     this.userRepository = userRepository;
+  }
+
+  public List<UserResponse> getAllUsers() {
+    return userRepository.findAll().stream()
+        .map(UserResponse::fromEntity)
+        .toList();
   }
 
   public UserResponse getUser(long id) {

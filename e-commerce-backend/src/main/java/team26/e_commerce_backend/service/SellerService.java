@@ -1,5 +1,6 @@
 package team26.e_commerce_backend.service;
 
+import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -12,6 +13,10 @@ public class SellerService {
 
   public SellerService(SellerRepository sellerRepository) {
     this.sellerRepository = sellerRepository;
+  }
+
+  public List<SellerResponse> getAllSellers() {
+    return sellerRepository.findAll().stream().map(SellerResponse::fromEntity).toList();
   }
 
   public SellerResponse getSeller(long id) {
