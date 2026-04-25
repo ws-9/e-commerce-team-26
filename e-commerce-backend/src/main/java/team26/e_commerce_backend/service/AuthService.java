@@ -2,6 +2,7 @@ package team26.e_commerce_backend.service;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import team26.e_commerce_backend.dao.UserRepository;
 import team26.e_commerce_backend.dto.request.RegisterRequest;
 import team26.e_commerce_backend.entity.User;
@@ -16,6 +17,7 @@ public class AuthService {
     this.passwordEncoder = passwordEncoder;
   }
 
+  @Transactional
   public void register(RegisterRequest request) throws Exception {
     if (userRepository.findByEmail(request.email()).isPresent()) {
       throw new Exception("Email is already taken");

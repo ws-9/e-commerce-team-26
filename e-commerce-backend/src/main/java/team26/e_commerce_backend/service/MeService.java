@@ -2,6 +2,7 @@ package team26.e_commerce_backend.service;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import team26.e_commerce_backend.component.AuthUtilsComponent;
 import team26.e_commerce_backend.dao.AdminRepository;
@@ -28,6 +29,7 @@ public class MeService {
     this.authUtilsComponent = authUtilsComponent;
   }
 
+  @Transactional(readOnly = true)
   public MeResponse getMe() {
     long userId = authUtilsComponent.getAuthenticatedUserId();
 
