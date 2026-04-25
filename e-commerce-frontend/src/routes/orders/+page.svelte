@@ -1,4 +1,5 @@
 <script>
+	import { resolve } from '$app/paths';
 	import OrderCard from '$lib/components/OrderCard.svelte';
 	import StorefrontShell from '$lib/components/StorefrontShell.svelte';
 
@@ -32,11 +33,11 @@
 				<p class="mt-3 text-sm text-slate-600">
 					When you place your first order, it will show up here with its status and line items.
 				</p>
-				<a class="cta-button mt-6 inline-flex" href="/products">Start browsing</a>
+				<a class="cta-button mt-6 inline-flex" href={resolve('/products')}>Start browsing</a>
 			</section>
 		{:else}
 			<section class="space-y-5">
-				{#each data.orders as order}
+				{#each data.orders as order (order.id)}
 					<OrderCard {order} />
 				{/each}
 			</section>

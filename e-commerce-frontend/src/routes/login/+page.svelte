@@ -1,4 +1,5 @@
 <script>
+	import { resolve } from '$app/paths';
 	import { authStore } from '$lib/stores/authStore.js';
 	import { goto } from '$app/navigation';
 
@@ -8,9 +9,9 @@
 	let loading = $state(false);
 
 	function redirectByRole(role) {
-		if (role === 'ADMIN') goto('/dashboard/admin');
-		else if (role === 'SELLER') goto('/dashboard/seller');
-		else goto('/products');
+		if (role === 'ADMIN') goto(resolve('/dashboard/admin'));
+		else if (role === 'SELLER') goto(resolve('/dashboard/seller'));
+		else goto(resolve('/products'));
 	}
 
 	async function handleSubmit(e) {
@@ -72,7 +73,7 @@
 
 		<p class="mt-4 text-center text-sm text-gray-600">
 			Don't have an account?
-			<a href="/register" class="font-medium text-blue-600 hover:underline">Register</a>
+			<a href={resolve('/register')} class="font-medium text-blue-600 hover:underline">Register</a>
 		</p>
 	</div>
 </div>

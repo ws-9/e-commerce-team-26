@@ -1,10 +1,11 @@
 <script>
+	import { resolve } from '$app/paths';
 	import { authStore } from '$lib/stores/authStore.js';
 	import { goto } from '$app/navigation';
 
 	function logout() {
 		authStore.logout();
-		goto('/login');
+		goto(resolve('/login'));
 	}
 </script>
 

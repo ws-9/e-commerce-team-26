@@ -1,4 +1,5 @@
 <script>
+	import { resolve } from '$app/paths';
 	import ProductCard from '$lib/components/ProductCard.svelte';
 	import RatingStars from '$lib/components/RatingStars.svelte';
 	import StorefrontShell from '$lib/components/StorefrontShell.svelte';
@@ -29,12 +30,12 @@
 			<p class="mt-2 text-sm">
 				{data.error ?? 'Please return to the catalog and try another item.'}
 			</p>
-			<a class="cta-button mt-6 inline-flex" href="/products">Back to products</a>
+			<a class="cta-button mt-6 inline-flex" href={resolve('/products')}>Back to products</a>
 		</section>
 	{:else}
 		<div class="space-y-8">
 			<nav class="text-sm font-semibold text-slate-500">
-				<a class="hover:text-slate-950" href="/products">Products</a>
+				<a class="hover:text-slate-950" href={resolve('/products')}>Products</a>
 				<span class="mx-2">/</span>
 				<span>{data.product.category}</span>
 			</nav>
@@ -51,7 +52,7 @@
 						/>
 					</div>
 					<div class="grid gap-4 sm:grid-cols-2">
-						{#each data.product.images.slice(1) as image}
+						{#each data.product.images.slice(1) as image (image)}
 							<img
 								class="aspect-[4/3] rounded-[1.5rem] object-cover"
 								src={image}
@@ -143,7 +144,7 @@
 						More options from the same category, ready to compare.
 					</p>
 					<div class="mt-6 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-						{#each data.relatedProducts as product}
+						{#each data.relatedProducts as product (product.id)}
 							<ProductCard {product} />
 						{/each}
 					</div>

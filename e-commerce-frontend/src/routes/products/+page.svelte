@@ -1,4 +1,5 @@
 <script>
+	import { resolve } from '$app/paths';
 	import ProductCard from '$lib/components/ProductCard.svelte';
 	import StorefrontShell from '$lib/components/StorefrontShell.svelte';
 	import { formatCurrency } from '$lib/utils/formatters.js';
@@ -12,19 +13,20 @@
 		{ value: 'rating-desc', label: 'Top rated' }
 	];
 
-	function buildPageHref(page) {
-		const params = new URLSearchParams();
+	function buildPagePath(page) {
+		const params = [
+			data.filters.query ? ['query', data.filters.query] : null,
+			data.filters.category ? ['category', data.filters.category] : null,
+			data.filters.minPrice ? ['minPrice', data.filters.minPrice] : null,
+			data.filters.maxPrice ? ['maxPrice', data.filters.maxPrice] : null,
+			data.filters.sort && data.filters.sort !== 'featured' ? ['sort', data.filters.sort] : null,
+			page > 1 ? ['page', String(page)] : null
+		]
+			.filter(Boolean)
+			.map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
+			.join('&');
 
-		if (data.filters.query) params.set('query', data.filters.query);
-		if (data.filters.category) params.set('category', data.filters.category);
-		if (data.filters.minPrice) params.set('minPrice', data.filters.minPrice);
-		if (data.filters.maxPrice) params.set('maxPrice', data.filters.maxPrice);
-		if (data.filters.sort && data.filters.sort !== 'featured')
-			params.set('sort', data.filters.sort);
-		if (page > 1) params.set('page', String(page));
-
-		const query = params.toString();
-		return query ? `/products?${query}` : '/products';
+		return params ? `/products?${params}` : '/products';
 	}
 </script>
 
@@ -56,7 +58,7 @@
 			<section class="grid gap-6 lg:grid-cols-[280px,1fr]">
 				<aside class="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
 					<h2 class="text-lg font-bold text-slate-950">Refine results</h2>
-					<form action="/products" class="mt-5 space-y-5">
+					<form action={resolve('/products')} class="mt-5 space-y-5">
 						<div>
 							<label class="mb-2 block text-sm font-semibold text-slate-700" for="query"
 								>Search</label
@@ -81,7 +83,7 @@
 								class="w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm text-slate-950 transition outline-none focus:border-sky-500"
 							>
 								<option value="">All categories</option>
-								{#each data.categories as category}
+								{#each data.categories as category (category.id)}
 									<option value={category.name} selected={data.filters.category === category.name}>
 										{category.name}
 									</option>
@@ -129,7 +131,7 @@
 								name="sort"
 								class="w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm text-slate-950 transition outline-none focus:border-sky-500"
 							>
-								{#each sortOptions as option}
+								{#each sortOptions as option (option.value)}
 									<option value={option.value} selected={data.filters.sort === option.value}>
 										{option.label}
 									</option>
@@ -159,13 +161,13 @@
 								</p>
 							</div>
 							<div class="flex flex-wrap gap-2">
-								{#each data.categories as category}
+								{#each data.categories as category (category.id)}
 									<a
 										class:text-white={data.filters.category === category.name}
 										class:bg-slate-950={data.filters.category === category.name}
 										class:border-slate-950={data.filters.category === category.name}
 										class="rounded-full border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-slate-950 hover:text-slate-950"
-										href={`/products?category=${encodeURIComponent(category.name)}`}
+										href={resolve(`/products?category=${encodeURIComponent(category.name)}`)}
 									>
 										{category.name}
 									</a>
@@ -179,11 +181,11 @@
 								<p class="mt-2 text-sm text-slate-600">
 									Try clearing a category or widening your price range.
 								</p>
-								<a class="cta-button mt-5 inline-flex" href="/products">Reset filters</a>
+								<a class="cta-button mt-5 inline-flex" href={resolve('/products')}>Reset filters</a>
 							</div>
 						{:else}
 							<div class="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-								{#each data.products as product}
+								{#each data.products as product (product.id)}
 									<ProductCard {product} />
 								{/each}
 							</div>
@@ -192,14 +194,13 @@
 
 					{#if data.totalProducts > 0}
 						<nav class="flex flex-wrap items-center justify-center gap-3">
-							{#each Array(data.pagination.totalPages) as _, index}
-								{@const page = index + 1}
+							{#each Array.from({ length: data.pagination.totalPages }, (_, index) => index + 1) as page (page)}
 								<a
 									class:bg-slate-950={page === data.pagination.page}
 									class:text-white={page === data.pagination.page}
 									class:border-slate-950={page === data.pagination.page}
 									class="rounded-full border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-slate-950 hover:text-slate-950"
-									href={buildPageHref(page)}
+									href={resolve(buildPagePath(page))}
 								>
 									{page}
 								</a>
@@ -227,7 +228,7 @@
 						</p>
 					</div>
 					<div class="mt-6 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-						{#each data.featuredProducts as product}
+						{#each data.featuredProducts as product (product.id)}
 							<ProductCard {product} />
 						{/each}
 					</div>

@@ -1,9 +1,10 @@
 <script>
+	import { resolve } from '$app/paths';
 	import { goto } from '$app/navigation';
 	import { browser } from '$app/environment';
 
 	$effect(() => {
-		if (browser) goto('/products');
+		if (browser) goto(resolve('/products'));
 	});
 </script>
 

@@ -1,5 +1,6 @@
 <script>
 	import './layout.css';
+	import { resolve } from '$app/paths';
 	import favicon from '$lib/assets/favicon.svg';
 	import { authStore } from '$lib/stores/authStore.js';
 	import { goto } from '$app/navigation';
@@ -16,13 +17,13 @@
 			!$authStore.email &&
 			!PUBLIC_ROUTES.some((r) => $page.url.pathname.startsWith(r))
 		) {
-			goto('/login');
+			goto(resolve('/login'));
 		}
 	});
 
 	function logout() {
 		authStore.logout();
-		goto('/login');
+		goto(resolve('/login'));
 	}
 </script>
 
@@ -33,7 +34,7 @@
 		class="flex items-center justify-between border-b bg-white px-6 py-3"
 		class:hidden={$authStore.userRole === 'SHOPPER'}
 	>
-		<a href="/dashboard" class="text-lg font-bold text-gray-800">Shop</a>
+		<a href={resolve('/dashboard')} class="text-lg font-bold text-gray-800">Shop</a>
 		<div class="flex items-center gap-4">
 			<span class="text-sm text-gray-600">{$authStore.email}</span>
 			<button onclick={logout} class="text-sm text-red-600 hover:underline">Logout</button>
