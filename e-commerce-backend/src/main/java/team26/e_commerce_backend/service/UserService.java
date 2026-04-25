@@ -5,15 +5,24 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+import team26.e_commerce_backend.component.AuthUtilsComponent;
+import team26.e_commerce_backend.dao.AdminRepository;
 import team26.e_commerce_backend.dao.UserRepository;
 import team26.e_commerce_backend.dto.response.UserResponse;
 
 @Service
 public class UserService {
   private final UserRepository userRepository;
+  private final AdminRepository adminRepository;
+  private final AuthUtilsComponent authUtils;
 
-  public UserService(UserRepository userRepository) {
+  public UserService(
+      UserRepository userRepository,
+      AdminRepository adminRepository,
+      AuthUtilsComponent authUtils) {
     this.userRepository = userRepository;
+    this.adminRepository = adminRepository;
+    this.authUtils = authUtils;
   }
 
   @Transactional(readOnly = true)
@@ -27,5 +36,24 @@ public class UserService {
         .findById(id)
         .map(UserResponse::fromEntity)
         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+  }
+
+  @Transactional
+  public void deleteUser(Long id) {
+    Long authenticatedId = authUtils.getAuthenticatedUserId();
+    boolean isAdmin = adminRepository.existsById(authenticatedId);
+
+    long targetId = (id == null) ? authenticatedId : id;
+
+    if (targetId != authenticatedId && !isAdmin) {
+      throw new ResponseStatusException(
+          HttpStatus.FORBIDDEN, "Only admins can delete other accounts");
+    }
+
+    if (!userRepository.existsById(targetId)) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
+    }
+
+    userRepository.deleteById(targetId);
   }
 }
