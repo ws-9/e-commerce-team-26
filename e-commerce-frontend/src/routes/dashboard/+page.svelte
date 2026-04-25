@@ -8,7 +8,7 @@
 		const role = $authStore.userRole;
 		if (role === 'ADMIN') goto('/dashboard/admin');
 		else if (role === 'SELLER') goto('/dashboard/seller');
-		else if (role === 'SHOPPER') goto('/dashboard/shopper');
+		else if (role === 'SHOPPER') goto('/products');
 	});
 </script>
 

@@ -1,5 +1,7 @@
 import { writable } from 'svelte/store';
 import { browser } from '$app/environment';
+import { deriveRole } from '$lib/services/storefrontMappers.js';
+import { getAuthHeader } from '$lib/utils/basicAuth.js';
 
 function getStoredAuth() {
 	if (!browser) return null;
@@ -20,16 +22,25 @@ function clearAuth() {
 }
 
 async function callMe(email, password) {
-	const res = await fetch('/me', {
-		headers: { Authorization: `Basic ${btoa(`${email}:${password}`)}` }
+	const res = await fetch('/api/me', {
+		headers: { Authorization: getAuthHeader(email, password) }
 	});
 	if (!res.ok) {
 		throw new Error(
-			res.status === 401 || res.status === 400 ? 'Invalid email or password' : 'Authentication failed'
+			res.status === 401 || res.status === 400
+				? 'Invalid email or password'
+				: 'Authentication failed'
 		);
 	}
 	const data = await res.json();
-	return { email, password, userRole: data.role, userID: data.id };
+	return {
+		email,
+		password,
+		userRole: deriveRole(data),
+		userID: data.id,
+		name: data.name,
+		address: data.address
+	};
 }
 
 const empty = { email: null, password: null, userRole: null, userID: null };

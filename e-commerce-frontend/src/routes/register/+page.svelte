@@ -21,7 +21,7 @@
 		try {
 			if (role === 'SHOPPER') {
 				await authStore.registerShopper(email, password, name, address);
-				goto('/dashboard/shopper');
+				goto('/products');
 			} else {
 				await authStore.registerSeller(email, password, name, address, {
 					businessName,
@@ -71,7 +71,7 @@
 					type="email"
 					bind:value={email}
 					required
-					class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+					class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
 				/>
 			</div>
 			<div>
@@ -81,7 +81,7 @@
 					type="password"
 					bind:value={password}
 					required
-					class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+					class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
 				/>
 			</div>
 			<div>
@@ -91,7 +91,7 @@
 					type="text"
 					bind:value={name}
 					required
-					class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+					class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
 				/>
 			</div>
 			<div>
@@ -101,7 +101,7 @@
 					type="text"
 					bind:value={address}
 					required
-					class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+					class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
 				/>
 			</div>
 
@@ -115,7 +115,7 @@
 						type="text"
 						bind:value={businessName}
 						required
-						class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+						class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
 					/>
 				</div>
 				<div>
@@ -126,7 +126,7 @@
 						id="description"
 						bind:value={description}
 						rows="3"
-						class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+						class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
 					></textarea>
 				</div>
 				<div>
@@ -136,7 +136,7 @@
 						type="text"
 						bind:value={taxID}
 						required
-						class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+						class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
 					/>
 				</div>
 				<div>
@@ -148,7 +148,7 @@
 						type="email"
 						bind:value={contactEmail}
 						required
-						class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+						class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
 					/>
 				</div>
 			{/if}

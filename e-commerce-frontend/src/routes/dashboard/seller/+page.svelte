@@ -14,7 +14,10 @@
 	{#if $authStore.businessName}
 		<p class="mb-6 text-sm text-gray-400">{$authStore.businessName}</p>
 	{/if}
-	<button onclick={logout} class="rounded-lg bg-red-600 px-4 py-2 text-sm text-white hover:bg-red-700">
+	<button
+		onclick={logout}
+		class="rounded-lg bg-red-600 px-4 py-2 text-sm text-white hover:bg-red-700"
+	>
 		Logout
 	</button>
 </div>

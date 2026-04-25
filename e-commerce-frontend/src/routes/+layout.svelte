@@ -11,7 +11,11 @@
 	const PUBLIC_ROUTES = ['/login', '/register'];
 
 	$effect(() => {
-		if (browser && !$authStore.email && !PUBLIC_ROUTES.some((r) => $page.url.pathname.startsWith(r))) {
+		if (
+			browser &&
+			!$authStore.email &&
+			!PUBLIC_ROUTES.some((r) => $page.url.pathname.startsWith(r))
+		) {
 			goto('/login');
 		}
 	});
@@ -25,7 +29,10 @@
 <svelte:head><link rel="icon" href={favicon} /></svelte:head>
 
 {#if $authStore.email}
-	<nav class="flex items-center justify-between border-b bg-white px-6 py-3">
+	<nav
+		class="flex items-center justify-between border-b bg-white px-6 py-3"
+		class:hidden={$authStore.userRole === 'SHOPPER'}
+	>
 		<a href="/dashboard" class="text-lg font-bold text-gray-800">Shop</a>
 		<div class="flex items-center gap-4">
 			<span class="text-sm text-gray-600">{$authStore.email}</span>

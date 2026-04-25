@@ -10,7 +10,7 @@
 	function redirectByRole(role) {
 		if (role === 'ADMIN') goto('/dashboard/admin');
 		else if (role === 'SELLER') goto('/dashboard/seller');
-		else goto('/dashboard/shopper');
+		else goto('/products');
 	}
 
 	async function handleSubmit(e) {
@@ -47,7 +47,7 @@
 					bind:value={email}
 					required
 					autocomplete="email"
-					class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+					class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
 				/>
 			</div>
 			<div>
@@ -58,7 +58,7 @@
 					bind:value={password}
 					required
 					autocomplete="current-password"
-					class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+					class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
 				/>
 			</div>
 			<button
