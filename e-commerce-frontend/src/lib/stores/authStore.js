@@ -22,7 +22,7 @@ function clearAuth() {
 }
 
 async function callMe(email, password) {
-	const res = await fetch('/api/me', {
+	const res = await fetch('http://localhost:8080/api/me', {
 		headers: { Authorization: getAuthHeader(email, password) }
 	});
 	if (!res.ok) {
@@ -71,7 +71,7 @@ export const authStore = {
 	},
 
 	async registerShopper(email, password, name, address) {
-		const res = await fetch('/api/auth/register', {
+		const res = await fetch('http://localhost:8080/api/auth/register', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ email, password, name, address, role: 'SHOPPER' })
@@ -84,7 +84,7 @@ export const authStore = {
 	},
 
 	async registerSeller(email, password, name, address, sellerExtras) {
-		const res = await fetch('/api/auth/register', {
+		const res = await fetch('http://localhost:8080/api/auth/register', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ email, password, name, address, role: 'SELLER' })
