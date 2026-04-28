@@ -11,6 +11,7 @@ import team26.e_commerce_backend.dao.CategoryRepository;
 import team26.e_commerce_backend.dao.ProductRepository;
 import team26.e_commerce_backend.dao.SellerRepository;
 import team26.e_commerce_backend.dto.request.CreateProductRequest;
+import team26.e_commerce_backend.dto.request.UpdateProductRequest;
 import team26.e_commerce_backend.dto.response.ProductResponse;
 import team26.e_commerce_backend.entity.Category;
 import team26.e_commerce_backend.entity.Product;
@@ -80,6 +81,39 @@ public class ProductService {
     product.setStockQty(request.stockQty());
     product.setSeller(seller);
     product.setCategory(category);
+
+    return ProductResponse.fromEntity(productRepository.save(product));
+  }
+
+  @Transactional
+  public ProductResponse updateProduct(Long id, UpdateProductRequest request) {
+    Long authenticatedId = authUtils.getAuthenticatedUserId();
+    Product product =
+        productRepository
+            .findById(id)
+            .orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found"));
+
+    boolean isAdmin = adminRepository.existsById(authenticatedId);
+    boolean isOwner = product.getSeller().getUser().getId().equals(authenticatedId);
+
+    if (!isOwner && !isAdmin) {
+      throw new ResponseStatusException(
+          HttpStatus.FORBIDDEN, "Only the seller or an admin can update this product");
+    }
+
+    if (request.name() != null) {
+      product.setName(request.name());
+    }
+    if (request.description() != null) {
+      product.setDescription(request.description());
+    }
+    if (request.price() != null) {
+      product.setPrice(request.price());
+    }
+    if (request.stockQty() != null) {
+      product.setStockQty(request.stockQty());
+    }
 
     return ProductResponse.fromEntity(productRepository.save(product));
   }

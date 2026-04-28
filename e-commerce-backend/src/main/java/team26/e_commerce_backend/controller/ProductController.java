@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import team26.e_commerce_backend.dto.request.CreateProductRequest;
+import team26.e_commerce_backend.dto.request.UpdateProductRequest;
 import team26.e_commerce_backend.dto.response.ProductResponse;
 import team26.e_commerce_backend.service.ProductService;
 
@@ -42,6 +43,15 @@ public class ProductController {
   public ResponseEntity<ProductResponse> createProduct(
       @RequestBody @Valid CreateProductRequest request) {
     return ResponseEntity.status(HttpStatus.CREATED).body(productService.createProduct(request));
+  }
+
+  @Operation(
+      summary = "Update product",
+      description = "Updates a product by its ID. Only the seller who owns the product or an admin can perform this action.")
+  @PatchMapping("/{id}")
+  public ResponseEntity<ProductResponse> updateProduct(
+      @PathVariable Long id, @RequestBody @Valid UpdateProductRequest request) {
+    return ResponseEntity.ok(productService.updateProduct(id, request));
   }
 
   @Operation(
