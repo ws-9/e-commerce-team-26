@@ -67,5 +67,44 @@ async getProducts({ fetch }) {
 
 	getFeaturedProducts(products) {
 		return products.slice(0, 6);
+	},
+
+	async createProduct(productData, { fetch }) {
+		const auth = JSON.parse(localStorage.getItem('auth') ?? '{}');
+		const res = await fetch('http://localhost:8080/api/products', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: 'Basic ' + btoa(`${auth.email}:${auth.password}`)
+			},
+			body: JSON.stringify(productData)
+		});
+		if (!res.ok) throw new Error('Failed to create product');
+		return await res.json();
+	},
+
+	async deleteProduct(id, { fetch }) {
+		const auth = JSON.parse(localStorage.getItem('auth') ?? '{}');
+		const res = await fetch(`http://localhost:8080/api/products/${id}`, {
+			method: 'DELETE',
+			headers: {
+				Authorization: 'Basic ' + btoa(`${auth.email}:${auth.password}`)
+			}
+		});
+		if (!res.ok) throw new Error('Failed to delete product');
+	},
+
+	async updateProduct(id, productData, { fetch }) {
+		const auth = JSON.parse(localStorage.getItem('auth') ?? '{}');
+		const res = await fetch(`http://localhost:8080/api/products/${id}`, {
+			method: 'PATCH',
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: 'Basic ' + btoa(`${auth.email}:${auth.password}`)
+			},
+			body: JSON.stringify(productData)
+		});
+		if (!res.ok) throw new Error('Failed to update product');
+		return await res.json();
 	}
 };
