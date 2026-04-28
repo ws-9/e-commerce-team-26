@@ -15,7 +15,12 @@ public class ProductService {
   }
 
   @Transactional(readOnly = true)
-  public List<ProductResponse> getAllProducts() {
+  public List<ProductResponse> getAllProducts(Long sellerUserId) {
+    if (sellerUserId != null) {
+      return productRepository.findBySeller_userId(sellerUserId).stream()
+          .map(ProductResponse::fromEntity)
+          .toList();
+    }
     return productRepository.findAll().stream().map(ProductResponse::fromEntity).toList();
   }
 

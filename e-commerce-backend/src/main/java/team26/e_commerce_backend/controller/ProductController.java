@@ -20,8 +20,9 @@ public class ProductController {
 
   @Operation(summary = "Get all products")
   @GetMapping
-  public ResponseEntity<List<ProductResponse>> getAllProducts() {
-    return ResponseEntity.ok(productService.getAllProducts());
+  public ResponseEntity<List<ProductResponse>> getAllProducts(
+      @RequestParam(required = false, name = "seller_id") Long sellerUserId) {
+    return ResponseEntity.ok(productService.getAllProducts(sellerUserId));
   }
 
   @Operation(summary = "Get product by ID")
