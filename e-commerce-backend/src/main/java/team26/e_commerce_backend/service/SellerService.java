@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import team26.e_commerce_backend.component.AuthUtilsComponent;
+import team26.e_commerce_backend.dao.AdminRepository;
 import team26.e_commerce_backend.dao.SellerRepository;
 import team26.e_commerce_backend.dao.UserRepository;
 import team26.e_commerce_backend.dto.request.CreateSellerRequest;
@@ -18,14 +19,17 @@ import team26.e_commerce_backend.entity.User;
 public class SellerService {
   private final SellerRepository sellerRepository;
   private final UserRepository userRepository;
+  private final AdminRepository adminRepository;
   private final AuthUtilsComponent authUtils;
 
   public SellerService(
       SellerRepository sellerRepository,
       UserRepository userRepository,
+      AdminRepository adminRepository,
       AuthUtilsComponent authUtils) {
     this.sellerRepository = sellerRepository;
     this.userRepository = userRepository;
+    this.adminRepository = adminRepository;
     this.authUtils = authUtils;
   }
 
@@ -86,5 +90,24 @@ public class SellerService {
     if (request.contactEmail() != null) {
       seller.setContactEmail(request.contactEmail());
     }
+  }
+
+  @Transactional
+  public void deleteSeller(Long id) {
+    Long authenticatedId = authUtils.getAuthenticatedUserId();
+    boolean isAdmin = adminRepository.existsById(authenticatedId);
+
+    long targetId = (id == null) ? authenticatedId : id;
+
+    if (targetId != authenticatedId && !isAdmin) {
+      throw new ResponseStatusException(
+          HttpStatus.FORBIDDEN, "Only admins can delete other sellers");
+    }
+
+    if (!sellerRepository.existsById(targetId)) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Seller not found");
+    }
+
+    sellerRepository.deleteById(targetId);
   }
 }

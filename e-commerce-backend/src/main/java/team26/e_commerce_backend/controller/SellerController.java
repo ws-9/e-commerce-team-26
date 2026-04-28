@@ -45,4 +45,11 @@ public class SellerController {
   public void updateSeller(@RequestBody @Valid UpdateSellerRequest request) {
     sellerService.updateSeller(request);
   }
+
+  @DeleteMapping({"/{id}", ""})
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  @Operation(summary = "Delete seller account")
+  public void deleteSeller(@PathVariable(required = false) Long id) {
+    sellerService.deleteSeller(id);
+  }
 }
