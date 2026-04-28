@@ -38,14 +38,28 @@
 			</a>
 
 			<div class="flex items-center gap-6">
-				<div class="hidden items-center gap-2 sm:flex">
-					<span class="text-sm font-medium text-slate-600">{$authStore.email}</span>
-					<button
-						onclick={logout}
-						class="text-sm font-bold text-red-600 transition hover:text-red-700"
+				<div class="hidden items-center gap-4 sm:flex">
+					<a
+						href={resolve('/orders')}
+						class="text-sm font-bold text-slate-600 transition hover:text-slate-950"
 					>
-						Logout
-					</button>
+						My Orders
+					</a>
+					<div class="h-4 w-px bg-slate-200"></div>
+					<div class="flex items-center gap-2">
+						<a
+							href={resolve('/profile')}
+							class="text-sm font-medium text-slate-600 transition hover:text-slate-950"
+						>
+							{$authStore.name ?? $authStore.email}
+						</a>
+						<button
+							onclick={logout}
+							class="text-sm font-bold text-red-600 transition hover:text-red-700"
+						>
+							Logout
+						</button>
+					</div>
 				</div>
 
 				<div class="h-6 w-px bg-slate-200"></div>
