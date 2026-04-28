@@ -8,7 +8,9 @@ import org.springframework.web.server.ResponseStatusException;
 import team26.e_commerce_backend.component.AuthUtilsComponent;
 import team26.e_commerce_backend.dao.AdminRepository;
 import team26.e_commerce_backend.dao.UserRepository;
+import team26.e_commerce_backend.dto.request.UpdateUserRequest;
 import team26.e_commerce_backend.dto.response.UserResponse;
+import team26.e_commerce_backend.entity.User;
 
 @Service
 public class UserService {
@@ -55,5 +57,22 @@ public class UserService {
     }
 
     userRepository.deleteById(targetId);
+  }
+
+  @Transactional
+  public UserResponse updateUser(long id, UpdateUserRequest request) {
+    User user =
+        userRepository
+            .findById(id)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+    if (request.name() != null) {
+      user.setName(request.name());
+    }
+    if (request.address() != null) {
+      user.setAddress(request.address());
+    }
+
+    return UserResponse.fromEntity(userRepository.save(user));
   }
 }

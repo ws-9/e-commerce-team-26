@@ -77,8 +77,14 @@ public class SellerService {
                     new ResponseStatusException(
                         HttpStatus.FORBIDDEN, "Authenticated user is not a seller"));
 
-    seller.setBusinessName(request.businessName());
-    seller.setDescription(request.description());
-    seller.setContactEmail(request.contactEmail());
+    if (request.businessName() != null) {
+      seller.setBusinessName(request.businessName());
+    }
+    if (request.description() != null) {
+      seller.setDescription(request.description());
+    }
+    if (request.contactEmail() != null) {
+      seller.setContactEmail(request.contactEmail());
+    }
   }
 }
