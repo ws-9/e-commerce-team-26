@@ -41,22 +41,28 @@ public class UserService {
   }
 
   @Transactional
-  public void deleteUser(Long id) {
+  public void deleteMe() {
+    Long authenticatedId = authUtils.getAuthenticatedUserId();
+    if (!userRepository.existsById(authenticatedId)) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User profile not found");
+    }
+    userRepository.deleteById(authenticatedId);
+  }
+
+  @Transactional
+  public void deleteUserById(long id) {
     Long authenticatedId = authUtils.getAuthenticatedUserId();
     boolean isAdmin = adminRepository.existsById(authenticatedId);
 
-    long targetId = (id == null) ? authenticatedId : id;
-
-    if (targetId != authenticatedId && !isAdmin) {
-      throw new ResponseStatusException(
-          HttpStatus.FORBIDDEN, "Only admins can delete other accounts");
+    if (!isAdmin) {
+      throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only admins can delete users by ID");
     }
 
-    if (!userRepository.existsById(targetId)) {
+    if (!userRepository.existsById(id)) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
     }
 
-    userRepository.deleteById(targetId);
+    userRepository.deleteById(id);
   }
 
   @Transactional

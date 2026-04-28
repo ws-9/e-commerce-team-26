@@ -93,21 +93,28 @@ public class SellerService {
   }
 
   @Transactional
-  public void deleteSeller(Long id) {
+  public void deleteMySellerProfile() {
+    Long authenticatedId = authUtils.getAuthenticatedUserId();
+    if (!sellerRepository.existsById(authenticatedId)) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Seller profile not found");
+    }
+    sellerRepository.deleteById(authenticatedId);
+  }
+
+  @Transactional
+  public void deleteSellerById(long id) {
     Long authenticatedId = authUtils.getAuthenticatedUserId();
     boolean isAdmin = adminRepository.existsById(authenticatedId);
 
-    long targetId = (id == null) ? authenticatedId : id;
-
-    if (targetId != authenticatedId && !isAdmin) {
+    if (!isAdmin) {
       throw new ResponseStatusException(
-          HttpStatus.FORBIDDEN, "Only admins can delete other sellers");
+          HttpStatus.FORBIDDEN, "Only admins can delete sellers by ID");
     }
 
-    if (!sellerRepository.existsById(targetId)) {
+    if (!sellerRepository.existsById(id)) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Seller not found");
     }
 
-    sellerRepository.deleteById(targetId);
+    sellerRepository.deleteById(id);
   }
 }

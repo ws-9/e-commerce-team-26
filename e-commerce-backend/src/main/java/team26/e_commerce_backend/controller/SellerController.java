@@ -46,10 +46,21 @@ public class SellerController {
     sellerService.updateSeller(request);
   }
 
-  @DeleteMapping({"/{id}", ""})
+  @DeleteMapping
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  @Operation(summary = "Delete seller account")
-  public void deleteSeller(@PathVariable(required = false) Long id) {
-    sellerService.deleteSeller(id);
+  @Operation(
+      summary = "Stop being a seller",
+      description = "Deletes the authenticated user's seller profile.")
+  public void deleteMySellerProfile() {
+    sellerService.deleteMySellerProfile();
+  }
+
+  @DeleteMapping("/{id}")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  @Operation(
+      summary = "Admin: Delete seller by ID",
+      description = "Deletes a specific seller profile by their ID. Requires admin privileges.")
+  public void deleteSellerById(@PathVariable long id) {
+    sellerService.deleteSellerById(id);
   }
 }
