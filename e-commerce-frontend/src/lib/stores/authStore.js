@@ -22,8 +22,9 @@ function clearAuth() {
 }
 
 async function callMe(email, password) {
+	const authHeader = getAuthHeader(email, password);
 	const res = await fetch('http://localhost:8080/api/me', {
-		headers: { Authorization: getAuthHeader(email, password) }
+		headers: { Authorization: authHeader }
 	});
 	if (!res.ok) {
 		throw new Error(
@@ -33,17 +34,33 @@ async function callMe(email, password) {
 		);
 	}
 	const data = await res.json();
+	let sellerInfo = null;
+
+	if (data.isSeller) {
+		try {
+			const sellerRes = await fetch(`http://localhost:8080/api/sellers/${data.id}`, {
+				headers: { Authorization: authHeader }
+			});
+			if (sellerRes.ok) {
+				sellerInfo = await sellerRes.json();
+			}
+		} catch (err) {
+			console.error('Failed to fetch seller info', err);
+		}
+	}
+
 	return {
 		email,
 		password,
 		userRole: deriveRole(data),
 		userID: data.id,
 		name: data.name,
-		address: data.address
+		address: data.address,
+		seller: sellerInfo
 	};
 }
 
-const empty = { email: null, password: null, userRole: null, userID: null };
+const empty = { email: null, password: null, userRole: null, userID: null, seller: null };
 const store = writable(getStoredAuth() ?? empty);
 
 export const authStore = {
@@ -135,5 +152,49 @@ export const authStore = {
 
 		store.set(empty);
 		clearAuth();
+	},
+
+	async becomeSeller(sellerData) {
+		let current;
+		store.subscribe((v) => (current = v))();
+
+		const res = await fetch('http://localhost:8080/api/sellers', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: getAuthHeader(current.email, current.password)
+			},
+			body: JSON.stringify(sellerData)
+		});
+
+		if (!res.ok) throw new Error('Failed to become a seller');
+
+		// Re-fetch user info to get the new role and seller details
+		const auth = await callMe(current.email, current.password);
+		store.set(auth);
+		persistAuth(auth);
+		return auth;
+	},
+
+	async updateSeller(sellerData) {
+		let current;
+		store.subscribe((v) => (current = v))();
+
+		const res = await fetch('http://localhost:8080/api/sellers', {
+			method: 'PATCH',
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: getAuthHeader(current.email, current.password)
+			},
+			body: JSON.stringify(sellerData)
+		});
+
+		if (!res.ok) throw new Error('Failed to update seller profile');
+
+		// Re-fetch user info to get updated seller details
+		const auth = await callMe(current.email, current.password);
+		store.set(auth);
+		persistAuth(auth);
+		return auth;
 	}
 };

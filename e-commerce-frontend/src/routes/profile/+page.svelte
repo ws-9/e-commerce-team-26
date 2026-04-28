@@ -6,8 +6,18 @@
 
 	let user = $derived($authStore);
 	let isEditing = $state(false);
+	let isBecomingSeller = $state(false);
+	
+	// Edit profile fields
 	let name = $state('');
 	let address = $state('');
+	
+	// Seller fields
+	let businessName = $state('');
+	let businessDescription = $state('');
+	let taxId = $state('');
+	let contactEmail = $state('');
+
 	let message = $state({ text: '', type: '' });
 	let loading = $state(false);
 
@@ -15,6 +25,17 @@
 		name = user.name ?? '';
 		address = user.address ?? '';
 		isEditing = true;
+		isBecomingSeller = false;
+		message = { text: '', type: '' };
+	}
+
+	function startBecomeSeller() {
+		businessName = '';
+		businessDescription = '';
+		taxId = '';
+		contactEmail = user.email ?? '';
+		isBecomingSeller = true;
+		isEditing = false;
 		message = { text: '', type: '' };
 	}
 
@@ -27,6 +48,25 @@
 			message = { text: 'Profile updated successfully!', type: 'success' };
 		} catch (err) {
 			message = { text: err.message || 'Update failed', type: 'error' };
+		} finally {
+			loading = false;
+		}
+	}
+
+	async function handleBecomeSeller(e) {
+		e.preventDefault();
+		loading = true;
+		try {
+			await authStore.becomeSeller({
+				businessName,
+				description: businessDescription,
+				taxId,
+				contactEmail
+			});
+			isBecomingSeller = false;
+			message = { text: 'Congratulations! You are now a verified seller.', type: 'success' };
+		} catch (err) {
+			message = { text: err.message || 'Failed to become a seller', type: 'error' };
 		} finally {
 			loading = false;
 		}
@@ -57,13 +97,23 @@
 				<p class="text-sm font-semibold tracking-[0.25em] text-slate-500 uppercase">Account</p>
 				<h1 class="mt-2 text-4xl font-black tracking-tight text-slate-950">My Profile</h1>
 			</div>
-			{#if !isEditing}
-				<button 
-					onclick={startEdit}
-					class="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-700 transition hover:border-slate-950 hover:text-slate-950"
-				>
-					Edit Profile
-				</button>
+			{#if !isEditing && !isBecomingSeller}
+				<div class="flex gap-3">
+					{#if user.userRole === 'SHOPPER'}
+						<button 
+							onclick={startBecomeSeller}
+							class="rounded-xl bg-blue-600 px-4 py-2 text-sm font-bold text-white transition hover:bg-blue-700 shadow-sm"
+						>
+							Become a Seller
+						</button>
+					{/if}
+					<button 
+						onclick={startEdit}
+						class="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-700 transition hover:border-slate-950 hover:text-slate-950"
+					>
+						Edit Profile
+					</button>
+				</div>
 			{/if}
 		</header>
 
@@ -120,6 +170,78 @@
 							<button
 								type="button"
 								onclick={() => (isEditing = false)}
+								class="rounded-2xl border border-slate-200 bg-white px-6 py-3 text-sm font-bold text-slate-700 transition hover:bg-slate-50"
+							>
+								Cancel
+							</button>
+						</div>
+					</form>
+				{:else if isBecomingSeller}
+					<form onsubmit={handleBecomeSeller} class="space-y-6">
+						<div>
+							<h3 class="text-xl font-bold text-slate-950">Register Business</h3>
+							<p class="text-sm text-slate-500">Provide your business details to start selling on Team 26.</p>
+						</div>
+						
+						<div class="grid gap-6 sm:grid-cols-2">
+							<div>
+								<label for="biz-name" class="mb-2 block text-sm font-bold text-slate-700">Business Name</label>
+								<input
+									id="biz-name"
+									type="text"
+									bind:value={businessName}
+									required
+									placeholder="Acme Corp"
+									class="w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm text-slate-950 transition outline-none focus:border-sky-500"
+								/>
+							</div>
+							<div>
+								<label for="biz-tax" class="mb-2 block text-sm font-bold text-slate-700">Tax ID</label>
+								<input
+									id="biz-tax"
+									type="text"
+									bind:value={taxId}
+									required
+									placeholder="XX-XXXXXXX"
+									class="w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm text-slate-950 transition outline-none focus:border-sky-500"
+								/>
+							</div>
+						</div>
+
+						<div>
+							<label for="biz-email" class="mb-2 block text-sm font-bold text-slate-700">Business Contact Email</label>
+							<input
+								id="biz-email"
+								type="email"
+								bind:value={contactEmail}
+								required
+								class="w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm text-slate-950 transition outline-none focus:border-sky-500"
+							/>
+						</div>
+
+						<div>
+							<label for="biz-desc" class="mb-2 block text-sm font-bold text-slate-700">Business Description</label>
+							<textarea
+								id="biz-desc"
+								bind:value={businessDescription}
+								required
+								rows="3"
+								placeholder="Describe what you sell..."
+								class="w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm text-slate-950 transition outline-none focus:border-sky-500"
+							></textarea>
+						</div>
+
+						<div class="flex gap-3 pt-2">
+							<button
+								type="submit"
+								disabled={loading}
+								class="cta-button flex-grow bg-blue-600 hover:bg-blue-700"
+							>
+								{loading ? 'Processing…' : 'Register as Seller'}
+							</button>
+							<button
+								type="button"
+								onclick={() => (isBecomingSeller = false)}
 								class="rounded-2xl border border-slate-200 bg-white px-6 py-3 text-sm font-bold text-slate-700 transition hover:bg-slate-50"
 							>
 								Cancel
