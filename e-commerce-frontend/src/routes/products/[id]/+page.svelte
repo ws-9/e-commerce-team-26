@@ -1,9 +1,8 @@
 <script>
 	import { resolve } from '$app/paths';
 	import ProductCard from '$lib/components/ProductCard.svelte';
-	import RatingStars from '$lib/components/RatingStars.svelte';
 	import StorefrontShell from '$lib/components/StorefrontShell.svelte';
-	import { cart } from '$lib/stores/cart.js';
+	import { cartStore } from '$lib/stores/cartStore.js';
 	import { formatCurrency } from '$lib/utils/formatters.js';
 
 	let { data } = $props();
@@ -14,8 +13,8 @@
 	function addCurrentProductToCart() {
 		if (!data.product) return;
 
-		cart.addItem(data.product, quantity);
-		confirmation = `${quantity} ${quantity === 1 ? 'item' : 'items'} added to your cart.`;
+		cartStore.add(data.product);
+		confirmation = `Added to your cart.`;
 	}
 </script>
 
@@ -23,7 +22,7 @@
 	<title>{data.product ? data.product.name : 'Product detail'}</title>
 </svelte:head>
 
-<StorefrontShell categories={data.categories}>
+<StorefrontShell>
 	{#if data.error || !data.product}
 		<section class="rounded-[2rem] border border-red-200 bg-red-50 p-8 text-red-700 shadow-sm">
 			<h1 class="text-2xl font-bold">This product isn’t available.</h1>
@@ -37,35 +36,22 @@
 			<nav class="text-sm font-semibold text-slate-500">
 				<a class="hover:text-slate-950" href={resolve('/products')}>Products</a>
 				<span class="mx-2">/</span>
-				<span>{data.product.category}</span>
+				<span>{data.product.categoryName}</span>
 			</nav>
 
 			<section
-				class="grid gap-8 rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm lg:grid-cols-[1.1fr,0.9fr] lg:p-8"
+				class="grid gap-8 rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm lg:grid-cols-[1fr,1fr] lg:p-8"
 			>
 				<div class="space-y-4">
-					<div class="overflow-hidden rounded-[2rem] bg-slate-100">
-						<img
-							class="aspect-[4/3] w-full object-cover"
-							src={data.product.image}
-							alt={data.product.name}
-						/>
-					</div>
-					<div class="grid gap-4 sm:grid-cols-2">
-						{#each data.product.images.slice(1) as image (image)}
-							<img
-								class="aspect-[4/3] rounded-[1.5rem] object-cover"
-								src={image}
-								alt={data.product.name}
-							/>
-						{/each}
+					<div class="flex aspect-square items-center justify-center overflow-hidden rounded-[2rem] bg-slate-100">
+						<span class="text-6xl text-slate-300 font-bold">{data.product.name[0]}</span>
 					</div>
 				</div>
 
 				<div class="space-y-6">
 					<div>
 						<p class="text-sm font-semibold tracking-[0.25em] text-slate-500 uppercase">
-							{data.product.category}
+							{data.product.categoryName}
 						</p>
 						<h1 class="mt-3 text-4xl font-black tracking-tight text-slate-950">
 							{data.product.name}
@@ -73,50 +59,22 @@
 						<p class="mt-3 text-base text-slate-600">Sold by {data.product.sellerName}</p>
 					</div>
 
-					<RatingStars rating={data.product.rating} reviewCount={data.product.reviewCount} />
-
-					<div class="flex flex-wrap items-end gap-3">
+					<div class="flex items-center gap-3">
 						<span class="text-4xl font-black text-slate-950"
 							>{formatCurrency(data.product.price)}</span
 						>
-						{#if data.product.compareAtPrice}
-							<span class="text-lg text-slate-400 line-through">
-								{formatCurrency(data.product.compareAtPrice)}
-							</span>
-						{/if}
 					</div>
 
 					<p class="text-base leading-7 text-slate-700">{data.product.description}</p>
 
 					<div class="grid gap-3 rounded-[1.5rem] bg-slate-50 p-5 text-sm text-slate-700">
 						<div class="flex items-center justify-between gap-4">
-							<span class="font-semibold text-slate-950">Stock</span>
-							<span>{data.product.availability.stock}</span>
-						</div>
-						<div class="flex items-center justify-between gap-4">
-							<span class="font-semibold text-slate-950">Shipping</span>
-							<span>{data.product.availability.shipping}</span>
-						</div>
-						<div class="flex items-center justify-between gap-4">
-							<span class="font-semibold text-slate-950">Pickup</span>
-							<span>{data.product.availability.pickup}</span>
+							<span class="font-semibold text-slate-950">Availability</span>
+							<span>{data.product.stockQty > 0 ? `${data.product.stockQty} in stock` : 'Out of stock'}</span>
 						</div>
 					</div>
 
 					<div class="flex flex-col gap-4 sm:flex-row sm:items-end">
-						<div>
-							<label class="mb-2 block text-sm font-semibold text-slate-700" for="quantity">
-								Quantity
-							</label>
-							<input
-								id="quantity"
-								type="number"
-								min="1"
-								max={Math.max(data.product.stockQty, 1)}
-								bind:value={quantity}
-								class="w-28 rounded-2xl border border-slate-300 px-4 py-3 text-sm text-slate-950 transition outline-none focus:border-sky-500"
-							/>
-						</div>
 						<button
 							class="cta-button"
 							type="button"

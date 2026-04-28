@@ -8,19 +8,13 @@
 	let error = $state('');
 	let loading = $state(false);
 
-	function redirectByRole(role) {
-		if (role === 'ADMIN') goto(resolve('/dashboard/admin'));
-		else if (role === 'SELLER') goto(resolve('/dashboard/seller'));
-		else goto(resolve('/products'));
-	}
-
 	async function handleSubmit(e) {
 		e.preventDefault();
 		error = '';
 		loading = true;
 		try {
-			const { userRole } = await authStore.login(email, password);
-			redirectByRole(userRole);
+			await authStore.login(email, password);
+			goto(resolve('/products'));
 		} catch (err) {
 			error = err.message || 'Login failed';
 		} finally {

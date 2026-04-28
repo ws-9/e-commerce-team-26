@@ -34,7 +34,7 @@
 	<title>Browse Products</title>
 </svelte:head>
 
-<StorefrontShell categories={data.categories}>
+<StorefrontShell>
 	<div class="space-y-8">
 		<section
 			class="overflow-hidden rounded-[2rem] bg-[linear-gradient(135deg,#0f172a_0%,#1d4ed8_45%,#38bdf8_100%)] px-6 py-10 text-white shadow-xl lg:px-10"

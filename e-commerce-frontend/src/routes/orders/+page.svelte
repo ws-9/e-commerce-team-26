@@ -1,13 +1,9 @@
 <script>
+	import StorefrontShell from '$lib/components/StorefrontShell.svelte';
+	import { formatCurrency } from '$lib/utils/formatters.js';
+
 	let orders = $state([]);
 	let error = $state('');
-
-	function money(value) {
-		return new Intl.NumberFormat('en-US', {
-			style: 'currency',
-			currency: 'USD'
-		}).format(Number(value ?? 0));
-	}
 
 	function niceDate(value) {
 		return new Date(value).toLocaleString();
@@ -24,80 +20,93 @@
 			});
 
 			if (!res.ok) {
-				error = 'Failed to load orders';
+				error = 'Failed to load orders. Please try again later.';
 				return;
 			}
 
 			orders = await res.json();
 		} catch {
-			error = 'Error loading orders';
+			error = 'Error loading orders. Connection failed.';
 		}
 	}
 
 	loadOrders();
 </script>
 
-<div class="mx-auto max-w-5xl px-6 py-8">
-	<div class="mb-8 flex items-center justify-between">
-		<h1 class="text-4xl font-bold">My Orders</h1>
+<svelte:head>
+	<title>My Orders</title>
+</svelte:head>
 
-		<a href="/products" class="rounded-xl bg-gray-200 px-4 py-2 font-semibold text-slate-800">
-			← Back to Products
-		</a>
-	</div>
+<StorefrontShell>
+	<div class="space-y-8">
+		<header>
+			<p class="text-sm font-semibold tracking-[0.25em] text-slate-500 uppercase">History</p>
+			<h1 class="mt-2 text-4xl font-black tracking-tight text-slate-950">My Orders</h1>
+		</header>
 
-	{#if error}
-		<p class="rounded-xl bg-red-100 p-4 font-semibold text-red-700">{error}</p>
-	{:else if orders.length === 0}
-		<p>No orders yet.</p>
-	{:else}
-		<div class="space-y-6">
-			{#each orders as order}
-				<div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-					<div class="mb-4 flex items-start justify-between">
-						<div>
-							<h2 class="text-2xl font-bold">Order #{order.id}</h2>
-							<p class="text-sm text-slate-500">{niceDate(order.date)}</p>
-						</div>
-
-						<span class="rounded-full bg-green-100 px-3 py-1 text-sm font-bold text-green-700">
-							{order.status}
-						</span>
-					</div>
-
-					<div class="mb-4 grid gap-3 sm:grid-cols-2">
-						<div class="rounded-xl bg-slate-50 p-4">
-							<p class="text-sm text-slate-500">Shipping Address</p>
-							<p class="font-semibold">{order.shippingAddress}</p>
-						</div>
-
-						<div class="rounded-xl bg-slate-50 p-4">
-							<p class="text-sm text-slate-500">Total</p>
-							<p class="text-xl font-bold">{money(order.total)}</p>
-						</div>
-					</div>
-
-					<h3 class="mb-2 font-bold">Items</h3>
-
-					<div class="space-y-2">
-						{#each order.items as item}
-							<div class="flex items-center justify-between rounded-xl border border-slate-200 p-4">
-								<div>
-									<p class="font-bold">{item.productName}</p>
-									<p class="text-sm text-slate-500">Product ID: {item.productId}</p>
-								</div>
-
-								<div class="text-right">
-									<p class="font-semibold">Qty: {item.quantity}</p>
-									<p class="text-sm text-slate-500">
-										{money(item.priceAtPurchase)} each
-									</p>
-								</div>
+		{#if error}
+			<div class="rounded-2xl border border-red-200 bg-red-50 p-6 text-red-700">
+				<p class="font-bold">{error}</p>
+			</div>
+		{:else if orders.length === 0}
+			<div class="rounded-[2rem] border border-slate-200 bg-white p-12 text-center shadow-sm">
+				<h2 class="text-2xl font-bold text-slate-950">No orders yet.</h2>
+				<p class="mt-2 text-slate-600">Your order history will appear here once you make a purchase.</p>
+			</div>
+		{:else}
+			<div class="space-y-6">
+				{#each orders as order (order.id)}
+					<div class="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-sm">
+						<div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+							<div>
+								<h2 class="text-2xl font-black tracking-tight text-slate-950">Order #{order.id}</h2>
+								<p class="text-sm font-medium text-slate-500">{niceDate(order.date)}</p>
 							</div>
-						{/each}
+
+							<span class="inline-flex rounded-full bg-emerald-100 px-4 py-1.5 text-xs font-black tracking-wider text-emerald-700 uppercase">
+								{order.status}
+							</span>
+						</div>
+
+						<div class="mb-8 grid gap-4 sm:grid-cols-2">
+							<div class="rounded-2xl bg-slate-50 p-5">
+								<p class="text-xs font-bold tracking-wider text-slate-400 uppercase">Shipping Address</p>
+								<p class="mt-2 text-sm font-semibold text-slate-700">{order.shippingAddress}</p>
+							</div>
+
+							<div class="rounded-2xl bg-slate-950 p-5 text-white">
+								<p class="text-xs font-bold tracking-wider text-slate-400 uppercase">Order Total</p>
+								<p class="mt-2 text-2xl font-black">{formatCurrency(order.total)}</p>
+							</div>
+						</div>
+
+						<h3 class="mb-4 text-sm font-bold tracking-wider text-slate-500 uppercase">Items</h3>
+
+						<div class="space-y-3">
+							{#each order.items as item}
+								<div class="flex items-center justify-between rounded-2xl border border-slate-100 p-5 transition hover:border-slate-200">
+									<div class="flex items-center gap-4">
+										<div class="flex h-12 w-12 items-center justify-center rounded-xl bg-slate-50 text-lg font-bold text-slate-300">
+											{item.productName[0]}
+										</div>
+										<div>
+											<p class="font-bold text-slate-950">{item.productName}</p>
+											<p class="text-xs text-slate-400">ID: {item.productId}</p>
+										</div>
+									</div>
+
+									<div class="text-right">
+										<p class="text-sm font-bold text-slate-950">Qty: {item.quantity}</p>
+										<p class="text-xs text-slate-500">
+											{formatCurrency(item.priceAtPurchase)} each
+										</p>
+									</div>
+								</div>
+							{/each}
+						</div>
 					</div>
-				</div>
-			{/each}
-		</div>
-	{/if}
-</div>
+				{/each}
+			</div>
+		{/if}
+	</div>
+</StorefrontShell>
