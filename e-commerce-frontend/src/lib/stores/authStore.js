@@ -196,5 +196,25 @@ export const authStore = {
 		store.set(auth);
 		persistAuth(auth);
 		return auth;
+	},
+
+	async deleteSellerProfile() {
+		let current;
+		store.subscribe((v) => (current = v))();
+
+		const res = await fetch('http://localhost:8080/api/sellers', {
+			method: 'DELETE',
+			headers: {
+				Authorization: getAuthHeader(current.email, current.password)
+			}
+		});
+
+		if (!res.ok) throw new Error('Failed to delete business profile');
+
+		// Re-fetch user info to update role back to SHOPPER
+		const auth = await callMe(current.email, current.password);
+		store.set(auth);
+		persistAuth(auth);
+		return auth;
 	}
 };
