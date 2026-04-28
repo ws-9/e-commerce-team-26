@@ -3,15 +3,10 @@
 	import { authStore } from '$lib/stores/authStore.js';
 	import { goto } from '$app/navigation';
 
-	let role = $state('SHOPPER');
 	let email = $state('');
 	let password = $state('');
 	let name = $state('');
 	let address = $state('');
-	let businessName = $state('');
-	let description = $state('');
-	let taxID = $state('');
-	let contactEmail = $state('');
 	let error = $state('');
 	let loading = $state(false);
 
@@ -20,18 +15,8 @@
 		error = '';
 		loading = true;
 		try {
-			if (role === 'SHOPPER') {
-				await authStore.registerShopper(email, password, name, address);
-				goto(resolve('/products'));
-			} else {
-				await authStore.registerSeller(email, password, name, address, {
-					businessName,
-					description,
-					taxID,
-					contactEmail
-				});
-				goto(resolve('/dashboard/seller'));
-			}
+			await authStore.registerShopper(email, password, name, address);
+			goto(resolve('/products'));
 		} catch (err) {
 			error = err.message || 'Registration failed';
 		} finally {
@@ -49,20 +34,6 @@
 				{error}
 			</div>
 		{/if}
-
-		<div class="mb-6">
-			<p class="mb-2 text-sm font-medium text-gray-700">Account Type</p>
-			<div class="flex gap-6">
-				<label class="flex cursor-pointer items-center gap-2">
-					<input type="radio" bind:group={role} value="SHOPPER" class="text-blue-600" />
-					<span class="text-sm">Shopper</span>
-				</label>
-				<label class="flex cursor-pointer items-center gap-2">
-					<input type="radio" bind:group={role} value="SELLER" class="text-blue-600" />
-					<span class="text-sm">Seller</span>
-				</label>
-			</div>
-		</div>
 
 		<form onsubmit={handleSubmit} class="space-y-4">
 			<div>
@@ -105,54 +76,6 @@
 					class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
 				/>
 			</div>
-
-			{#if role === 'SELLER'}
-				<div>
-					<label for="businessName" class="mb-1 block text-sm font-medium text-gray-700"
-						>Business Name</label
-					>
-					<input
-						id="businessName"
-						type="text"
-						bind:value={businessName}
-						required
-						class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-					/>
-				</div>
-				<div>
-					<label for="description" class="mb-1 block text-sm font-medium text-gray-700"
-						>Business Description</label
-					>
-					<textarea
-						id="description"
-						bind:value={description}
-						rows="3"
-						class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-					></textarea>
-				</div>
-				<div>
-					<label for="taxID" class="mb-1 block text-sm font-medium text-gray-700">Tax ID</label>
-					<input
-						id="taxID"
-						type="text"
-						bind:value={taxID}
-						required
-						class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-					/>
-				</div>
-				<div>
-					<label for="contactEmail" class="mb-1 block text-sm font-medium text-gray-700"
-						>Business Contact Email</label
-					>
-					<input
-						id="contactEmail"
-						type="email"
-						bind:value={contactEmail}
-						required
-						class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-					/>
-				</div>
-			{/if}
 
 			<button
 				type="submit"
