@@ -97,5 +97,43 @@ export const authStore = {
 		store.set(withExtras);
 		persistAuth(withExtras);
 		return withExtras;
+	},
+
+	async updateProfile(name, address) {
+		let current;
+		store.subscribe((v) => (current = v))();
+
+		const res = await fetch(`http://localhost:8080/api/users/${current.userID}`, {
+			method: 'PATCH',
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: getAuthHeader(current.email, current.password)
+			},
+			body: JSON.stringify({ name, address })
+		});
+
+		if (!res.ok) throw new Error('Update failed');
+
+		const updated = { ...current, name, address };
+		store.set(updated);
+		persistAuth(updated);
+		return updated;
+	},
+
+	async deleteAccount() {
+		let current;
+		store.subscribe((v) => (current = v))();
+
+		const res = await fetch('http://localhost:8080/api/users', {
+			method: 'DELETE',
+			headers: {
+				Authorization: getAuthHeader(current.email, current.password)
+			}
+		});
+
+		if (!res.ok) throw new Error('Deletion failed');
+
+		store.set(empty);
+		clearAuth();
 	}
 };
