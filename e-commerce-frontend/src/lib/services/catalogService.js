@@ -12,34 +12,60 @@ async getProducts({ fetch }) {
 	return await res.json();
 },
 
-	searchProducts(products, filters) {
-		let items = [...products];
+searchProducts(products, filters) {
+	let items = [...products];
 
-		if (filters.query) {
-			items = items.filter(p =>
-				p.name.toLowerCase().includes(filters.query.toLowerCase())
-			);
+	if (filters.query) {
+		const q = filters.query.toLowerCase();
+
+		items = items.filter(p =>
+			p.name?.toLowerCase().includes(q) ||
+			p.description?.toLowerCase().includes(q) ||
+			p.sellerName?.toLowerCase().includes(q)
+		);
+	}
+
+	if (filters.category) {
+		items = items.filter(p => p.category?.name === filters.category);
+	}
+
+	if (filters.minPrice) {
+		items = items.filter(p => Number(p.price) >= Number(filters.minPrice));
+	}
+
+	if (filters.maxPrice) {
+		items = items.filter(p => Number(p.price) <= Number(filters.maxPrice));
+	}
+
+	if (filters.sort === 'price-asc') {
+		items.sort((a, b) => Number(a.price) - Number(b.price));
+	}
+
+	if (filters.sort === 'price-desc') {
+		items.sort((a, b) => Number(b.price) - Number(a.price));
+	}
+
+	if (filters.sort === 'rating-desc') {
+		// no rating field in backend yet, so fallback to highest price for now
+		items.sort((a, b) => Number(b.price) - Number(a.price));
+	}
+
+	const pageSize = 8;
+	const total = items.length;
+	const totalPages = Math.max(Math.ceil(total / pageSize), 1);
+	const page = Math.min(filters.page, totalPages);
+	const start = (page - 1) * pageSize;
+
+	return {
+		items: items.slice(start, start + pageSize),
+		total,
+		pagination: {
+			page,
+			pageSize,
+			totalPages
 		}
-
-		if (filters.category) {
-			items = items.filter(p => p.category?.name === filters.category);
-		}
-
-		const pageSize = 8;
-		const total = items.length;
-		const totalPages = Math.ceil(total / pageSize);
-		const start = (filters.page - 1) * pageSize;
-
-		return {
-			items: items.slice(start, start + pageSize),
-			total,
-			pagination: {
-				page: filters.page,
-				pageSize,
-				totalPages
-			}
-		};
-	},
+	};
+},
 
 	getCategories(products) {
 		const set = new Set(products.map(p => p.category?.name).filter(Boolean));
