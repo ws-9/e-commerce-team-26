@@ -1,46 +1,103 @@
 <script>
-	import { resolve } from '$app/paths';
-	import OrderCard from '$lib/components/OrderCard.svelte';
-	import StorefrontShell from '$lib/components/StorefrontShell.svelte';
+	let orders = $state([]);
+	let error = $state('');
 
-	let { data } = $props();
+	function money(value) {
+		return new Intl.NumberFormat('en-US', {
+			style: 'currency',
+			currency: 'USD'
+		}).format(Number(value ?? 0));
+	}
+
+	function niceDate(value) {
+		return new Date(value).toLocaleString();
+	}
+
+	async function loadOrders() {
+		const auth = JSON.parse(localStorage.getItem('auth') ?? '{}');
+
+		try {
+			const res = await fetch('http://localhost:8080/api/me/orders', {
+				headers: {
+					Authorization: 'Basic ' + btoa(`${auth.email}:${auth.password}`)
+				}
+			});
+
+			if (!res.ok) {
+				error = 'Failed to load orders';
+				return;
+			}
+
+			orders = await res.json();
+		} catch {
+			error = 'Error loading orders';
+		}
+	}
+
+	loadOrders();
 </script>
 
-<svelte:head>
-	<title>Order History</title>
-</svelte:head>
+<div class="mx-auto max-w-5xl px-6 py-8">
+	<div class="mb-8 flex items-center justify-between">
+		<h1 class="text-4xl font-bold">My Orders</h1>
 
-<StorefrontShell categories={data.categories}>
-	<div class="space-y-8">
-		<section
-			class="rounded-[2rem] bg-[linear-gradient(135deg,#0f172a_0%,#1e293b_55%,#475569_100%)] px-6 py-10 text-white shadow-xl lg:px-10"
-		>
-			<p class="text-sm font-semibold tracking-[0.35em] text-slate-300 uppercase">Orders</p>
-			<h1 class="mt-3 text-4xl font-black tracking-tight sm:text-5xl">Your order history</h1>
-			<p class="mt-4 max-w-2xl text-base leading-7 text-slate-200">
-				Review your recent purchases, order totals, and shipment status in one place.
-			</p>
-		</section>
-
-		{#if data.error}
-			<section class="rounded-[2rem] border border-red-200 bg-red-50 p-8 text-red-700 shadow-sm">
-				<h2 class="text-xl font-bold">We couldn’t load your orders.</h2>
-				<p class="mt-2 text-sm">{data.error}</p>
-			</section>
-		{:else if !data.orders.length}
-			<section class="rounded-[2rem] border border-slate-200 bg-white p-10 text-center shadow-sm">
-				<h2 class="text-2xl font-bold text-slate-950">No orders yet</h2>
-				<p class="mt-3 text-sm text-slate-600">
-					When you place your first order, it will show up here with its status and line items.
-				</p>
-				<a class="cta-button mt-6 inline-flex" href={resolve('/products')}>Start browsing</a>
-			</section>
-		{:else}
-			<section class="space-y-5">
-				{#each data.orders as order (order.id)}
-					<OrderCard {order} />
-				{/each}
-			</section>
-		{/if}
+		<a href="/products" class="rounded-xl bg-gray-200 px-4 py-2 font-semibold text-slate-800">
+			← Back to Products
+		</a>
 	</div>
-</StorefrontShell>
+
+	{#if error}
+		<p class="rounded-xl bg-red-100 p-4 font-semibold text-red-700">{error}</p>
+	{:else if orders.length === 0}
+		<p>No orders yet.</p>
+	{:else}
+		<div class="space-y-6">
+			{#each orders as order}
+				<div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+					<div class="mb-4 flex items-start justify-between">
+						<div>
+							<h2 class="text-2xl font-bold">Order #{order.id}</h2>
+							<p class="text-sm text-slate-500">{niceDate(order.date)}</p>
+						</div>
+
+						<span class="rounded-full bg-green-100 px-3 py-1 text-sm font-bold text-green-700">
+							{order.status}
+						</span>
+					</div>
+
+					<div class="mb-4 grid gap-3 sm:grid-cols-2">
+						<div class="rounded-xl bg-slate-50 p-4">
+							<p class="text-sm text-slate-500">Shipping Address</p>
+							<p class="font-semibold">{order.shippingAddress}</p>
+						</div>
+
+						<div class="rounded-xl bg-slate-50 p-4">
+							<p class="text-sm text-slate-500">Total</p>
+							<p class="text-xl font-bold">{money(order.total)}</p>
+						</div>
+					</div>
+
+					<h3 class="mb-2 font-bold">Items</h3>
+
+					<div class="space-y-2">
+						{#each order.items as item}
+							<div class="flex items-center justify-between rounded-xl border border-slate-200 p-4">
+								<div>
+									<p class="font-bold">{item.productName}</p>
+									<p class="text-sm text-slate-500">Product ID: {item.productId}</p>
+								</div>
+
+								<div class="text-right">
+									<p class="font-semibold">Qty: {item.quantity}</p>
+									<p class="text-sm text-slate-500">
+										{money(item.priceAtPurchase)} each
+									</p>
+								</div>
+							</div>
+						{/each}
+					</div>
+				</div>
+			{/each}
+		</div>
+	{/if}
+</div>
