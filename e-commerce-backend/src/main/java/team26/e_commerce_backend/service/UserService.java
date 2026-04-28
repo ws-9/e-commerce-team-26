@@ -8,7 +8,9 @@ import org.springframework.web.server.ResponseStatusException;
 import team26.e_commerce_backend.component.AuthUtilsComponent;
 import team26.e_commerce_backend.dao.AdminRepository;
 import team26.e_commerce_backend.dao.UserRepository;
+import team26.e_commerce_backend.dto.request.UpdateUserRequest;
 import team26.e_commerce_backend.dto.response.UserResponse;
+import team26.e_commerce_backend.entity.User;
 
 @Service
 public class UserService {
@@ -39,21 +41,44 @@ public class UserService {
   }
 
   @Transactional
-  public void deleteUser(Long id) {
+  public void deleteMe() {
+    Long authenticatedId = authUtils.getAuthenticatedUserId();
+    if (!userRepository.existsById(authenticatedId)) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User profile not found");
+    }
+    userRepository.deleteById(authenticatedId);
+  }
+
+  @Transactional
+  public void deleteUserById(long id) {
     Long authenticatedId = authUtils.getAuthenticatedUserId();
     boolean isAdmin = adminRepository.existsById(authenticatedId);
 
-    long targetId = (id == null) ? authenticatedId : id;
-
-    if (targetId != authenticatedId && !isAdmin) {
-      throw new ResponseStatusException(
-          HttpStatus.FORBIDDEN, "Only admins can delete other accounts");
+    if (!isAdmin) {
+      throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only admins can delete users by ID");
     }
 
-    if (!userRepository.existsById(targetId)) {
+    if (!userRepository.existsById(id)) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
     }
 
-    userRepository.deleteById(targetId);
+    userRepository.deleteById(id);
+  }
+
+  @Transactional
+  public UserResponse updateUser(long id, UpdateUserRequest request) {
+    User user =
+        userRepository
+            .findById(id)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+    if (request.name() != null) {
+      user.setName(request.name());
+    }
+    if (request.address() != null) {
+      user.setAddress(request.address());
+    }
+
+    return UserResponse.fromEntity(userRepository.save(user));
   }
 }

@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import team26.e_commerce_backend.dto.request.UpdateUserRequest;
 import team26.e_commerce_backend.dto.response.UserResponse;
 import team26.e_commerce_backend.service.UserService;
 
@@ -30,10 +31,27 @@ public class UserController {
     return userService.getUser(id);
   }
 
-  @DeleteMapping({"/{id}", ""})
+  @DeleteMapping
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  @Operation(summary = "Delete user account")
-  public void deleteUser(@PathVariable(required = false) Long id) {
-    userService.deleteUser(id);
+  @Operation(
+      summary = "Delete my account",
+      description = "Deletes the authenticated user's profile.")
+  public void deleteMe() {
+    userService.deleteMe();
+  }
+
+  @DeleteMapping("/{id}")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  @Operation(
+      summary = "Admin: Delete user by ID",
+      description = "Deletes a specific user profile by their ID. Requires admin privileges.")
+  public void deleteUserById(@PathVariable long id) {
+    userService.deleteUserById(id);
+  }
+
+  @PatchMapping("/{id}")
+  @Operation(summary = "Update user details")
+  public UserResponse updateUser(@PathVariable long id, @RequestBody UpdateUserRequest request) {
+    return userService.updateUser(id, request);
   }
 }

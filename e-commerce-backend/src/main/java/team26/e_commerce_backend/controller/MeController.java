@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import team26.e_commerce_backend.dto.response.MeResponse;
 import team26.e_commerce_backend.dto.response.OrderResponse;
+import team26.e_commerce_backend.dto.response.ProductResponse;
 import team26.e_commerce_backend.service.MeService;
 import team26.e_commerce_backend.service.OrderService;
 
@@ -33,5 +34,11 @@ public class MeController {
   @Operation(summary = "Get authenticated user's orders")
   public List<OrderResponse> getMyOrders() {
     return orderService.getMyOrders();
+  }
+
+  @GetMapping("/products")
+  @Operation(summary = "Get authenticated seller's products")
+  public List<ProductResponse> getMyProducts() {
+    return meService.getMyProducts();
   }
 }
