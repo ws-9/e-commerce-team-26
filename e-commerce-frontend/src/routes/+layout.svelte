@@ -39,6 +39,15 @@
 
 			<div class="flex items-center gap-6">
 				<div class="hidden items-center gap-4 sm:flex">
+					{#if $authStore.userRole === 'ADMIN'}
+						<a
+							href={resolve('/admin')}
+							class="text-sm font-bold text-slate-600 transition hover:text-slate-950"
+						>
+							Admin Tasks
+						</a>
+						<div class="h-4 w-px bg-slate-200"></div>
+					{/if}
 					{#if $authStore.userRole === 'SELLER'}
 						<a
 							href={resolve('/profile/products')}
