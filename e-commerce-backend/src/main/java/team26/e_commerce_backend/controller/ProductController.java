@@ -2,9 +2,12 @@ package team26.e_commerce_backend.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import java.util.List;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import team26.e_commerce_backend.dto.request.CreateProductRequest;
 import team26.e_commerce_backend.dto.response.ProductResponse;
 import team26.e_commerce_backend.service.ProductService;
 
@@ -29,5 +32,25 @@ public class ProductController {
   @GetMapping("/{id}")
   public ResponseEntity<ProductResponse> getProductById(@PathVariable Long id) {
     return ResponseEntity.ok(productService.getProductById(id));
+  }
+
+  @Operation(
+      summary = "Create product",
+      description = "Creates a new product. Only users with a seller profile can perform this action.")
+  @PostMapping
+  @ResponseStatus(HttpStatus.CREATED)
+  public ResponseEntity<ProductResponse> createProduct(
+      @RequestBody @Valid CreateProductRequest request) {
+    return ResponseEntity.status(HttpStatus.CREATED).body(productService.createProduct(request));
+  }
+
+  @Operation(
+      summary = "Delete product",
+      description =
+          "Deletes a product by its ID. Only the seller who owns the product or an admin can perform this action.")
+  @DeleteMapping("/{id}")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void deleteProduct(@PathVariable Long id) {
+    productService.deleteProduct(id);
   }
 }
